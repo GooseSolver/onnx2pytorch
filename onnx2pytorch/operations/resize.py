@@ -38,13 +38,21 @@ class Resize(Operator):
 
         if len(scales) == 0:
             scales = None
+            for i in range(len(sizes)):
+                if isinstance(sizes[i], torch.Tensor):
+                    sizes[i] = float(sizes[i])
         elif len(sizes) == 0:
             sizes = None
+            for i in range(len(scales)):
+                if isinstance(scales[i], torch.Tensor):
+                    scales[i] = float(scales[i])
         else:
             raise ValueError(
                 "Only one of the two, scales or sizes, needs to be defined."
             )
-
+            
+        # inside the scales, if each element is a one-element tensor, extract it to a float. 
+        scales = tuple([tmp.item() if isinstance(tmp, torch.Tensor) else tmp for tmp in scales])
         return F.interpolate(
             inp,
             scale_factor=scales,
